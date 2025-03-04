@@ -5,15 +5,14 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 
 // Debugging: Check if this file is being loaded
-console.log("✅ userRoutes.js loaded");
+console.log(" userRoutes.js loaded");
 
 // Route to register a new user
 router.post('/users', async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        // Debugging: Check if request reaches here
-        console.log("➡️ Received POST request to /users");
+        console.log("Received POST request to /users");
 
         // Hash the password before storing it
         const hashedPassword = await bcrypt.hash(password, 10);
