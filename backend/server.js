@@ -21,11 +21,11 @@ console.log(app._router.stack);
 
 app._router.stack.forEach((layer) => {
     if (layer.route) {
-        console.log(`✅ Route registered: ${layer.route.path}`);
+        console.log(`Route registered: ${layer.route.path}`);
     } else if (layer.name === 'router' && layer.handle.stack) {
         layer.handle.stack.forEach((subLayer) => {
             if (subLayer.route) {
-                console.log(`✅ Sub-route registered: ${subLayer.route.path}`);
+                console.log(`Sub-route registered: ${subLayer.route.path}`);
             }
         });
     }
@@ -34,5 +34,5 @@ app._router.stack.forEach((layer) => {
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 pool.connect()
-    .then(() => console.log('✅ Connected to PostgreSQL'))
-    .catch(err => console.error('❌ Database connection error:', err));
+    .then(() => console.log(' Connected to PostgreSQL'))
+    .catch(err => console.error('Database connection error:', err));
