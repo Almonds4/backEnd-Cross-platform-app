@@ -29,6 +29,13 @@ CREATE TABLE IF NOT EXISTS "IIAEMS".users
     photo_url text,
     description text,
     "linkedIN" text,
+    gender character varying(50),
+    address character varying(255),
+    enrollment_date_time timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    email character varying(255),
+    account_type character varying(255) DEFAULT student,
+    alumni boolean DEFAULT FALSE,
+    alumni_grad date DEFAULT Null,
     CONSTRAINT users_pkey PRIMARY KEY (username)
 );
 
