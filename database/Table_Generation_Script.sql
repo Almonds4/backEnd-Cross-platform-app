@@ -129,6 +129,20 @@ CREATE TABLE IF NOT EXISTS "IIAEMS".grades
     PRIMARY KEY (username, course_id, module_title)
 );
 
+CREATE TABLE IF NOT EXISTS "IIAEMS".mailing_list
+(
+    id serial NOT NULL,
+    email character varying(255),
+    consent boolean,
+    date_subscribed timestamp with time zone,
+    opt_out_date timestamp with time zone,
+    source character varying,
+    "is-verified" boolean,
+    email_status character varying(255) DEFAULT Pending,
+    PRIMARY KEY (id),
+    CONSTRAINT email UNIQUE (email)
+);
+
 ALTER TABLE IF EXISTS "IIAEMS".instructor_courses
     ADD CONSTRAINT username FOREIGN KEY (username)
     REFERENCES "IIAEMS".users (username) MATCH SIMPLE
