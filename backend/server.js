@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const pool = require('./db'); 
 const userRoutes = require('./routes/userRoutes'); // Ensure correct path
-
+const cors = require('cors');
 
 dotenv.config(); 
 
@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
     res.send('IIAEMS Backend Running...');
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5050;
 console.log("Available routes:");
 console.log(app._router.stack);
 
