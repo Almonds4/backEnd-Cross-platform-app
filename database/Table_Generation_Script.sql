@@ -3,7 +3,7 @@
 BEGIN;
 
 
-CREATE TABLE IF NOT EXISTS "IIAEMS".courses
+CREATE TABLE IF NOT EXISTS courses
 (
     course_id serial NOT NULL,
     course_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS "IIAEMS".courses
     CONSTRAINT course_name UNIQUE (course_name)
 );
 
-CREATE TABLE IF NOT EXISTS "IIAEMS".users
+CREATE TABLE IF NOT EXISTS users
 (
     username character varying(255) COLLATE pg_catalog."default" NOT NULL,
     password character varying(255) COLLATE pg_catalog."default" NOT NULL,
@@ -33,33 +33,30 @@ CREATE TABLE IF NOT EXISTS "IIAEMS".users
     address character varying(255),
     enrollment_date_time timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     email character varying(255),
-    account_type character varying(255) DEFAULT student,
+    account_type character varying(255) DEFAULT 'student',
     alumni boolean DEFAULT FALSE,
     alumni_grad date DEFAULT Null,
     CONSTRAINT users_pkey PRIMARY KEY (username)
 );
 
-CREATE TABLE IF NOT EXISTS "IIAEMS".instructor_courses
+CREATE TABLE IF NOT EXISTS instructor_courses
 (
     username character varying(255),
     course_id integer,
-    CONSTRAINT user_id PRIMARY KEY (user_name, course_id)
+    CONSTRAINT user_id PRIMARY KEY (username, course_id)
 );
 
-CREATE TABLE IF NOT EXISTS "IIAEMS".modules
+CREATE TABLE IF NOT EXISTS modules
 (
     course_id integer,
     module_title character varying(255),
     module_description text,
     module_material text,
-    CONSTRAINT course_id PRIMARY KEY (course_id, module_title),
-    CONSTRAINT check_grade_range UNIQUE (module_grade)
+    CONSTRAINT course_id PRIMARY KEY (course_id, module_title)
 );
 
-COMMENT ON CONSTRAINT check_grade_range ON "IIAEMS".modules
-    IS 'grade BETWEEN 0 AND 100';
 
-CREATE TABLE IF NOT EXISTS "IIAEMS".library
+CREATE TABLE IF NOT EXISTS library
 (
     item_id serial,
     title character varying(255),
@@ -71,18 +68,18 @@ CREATE TABLE IF NOT EXISTS "IIAEMS".library
     PRIMARY KEY (item_id)
 );
 
-CREATE TABLE IF NOT EXISTS "IIAEMS".transaction_history
+CREATE TABLE IF NOT EXISTS transaction_history
 (
     transaction_id serial,
     username character varying(255),
     item character varying(255),
     price numeric(10, 2),
-    transaction_date time without time zone[] DEFAULT CURRENT_TIMESTAMP,
+    transaction_date timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     transaction_status transaction_status_enum NOT NULL,
     PRIMARY KEY (transaction_id)
 );
 
-CREATE TABLE IF NOT EXISTS "IIAEMS".calendar
+CREATE TABLE IF NOT EXISTS calendar
 (
     username character varying(255) NOT NULL,
     event_date timestamp with time zone NOT NULL,
@@ -90,19 +87,19 @@ CREATE TABLE IF NOT EXISTS "IIAEMS".calendar
     PRIMARY KEY (username, event_date)
 );
 
-CREATE TABLE IF NOT EXISTS "IIAEMS".discussion_forum
+CREATE TABLE IF NOT EXISTS discussion_forum
 (
     forum_id serial,
     course_id integer,
     module_title character varying(255),
     comment_username character varying(255),
     comment_description text NOT NULL,
-    comment_date_time timestamp with time zone DEFAULT CURRENT_STAMP,
+    comment_date_time timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     parent_comment_id integer,
     PRIMARY KEY (forum_id)
 );
 
-CREATE TABLE IF NOT EXISTS "IIAEMS".mailbox
+CREATE TABLE IF NOT EXISTS mailbox
 (
     mail_id serial,
     sender_username character varying(255),
@@ -112,7 +109,7 @@ CREATE TABLE IF NOT EXISTS "IIAEMS".mailbox
     PRIMARY KEY (mail_id)
 );
 
-CREATE TABLE IF NOT EXISTS "IIAEMS".enrollment
+CREATE TABLE IF NOT EXISTS enrollment
 (
     username character varying(255),
     course_id integer,
@@ -120,7 +117,7 @@ CREATE TABLE IF NOT EXISTS "IIAEMS".enrollment
     PRIMARY KEY (username, course_id)
 );
 
-CREATE TABLE IF NOT EXISTS "IIAEMS".grades
+CREATE TABLE IF NOT EXISTS grades
 (
     username character varying(255),
     course_id integer,
@@ -129,7 +126,7 @@ CREATE TABLE IF NOT EXISTS "IIAEMS".grades
     PRIMARY KEY (username, course_id, module_title)
 );
 
-CREATE TABLE IF NOT EXISTS "IIAEMS".mailing_list
+CREATE TABLE IF NOT EXISTS mailing_list
 (
     id serial NOT NULL,
     email character varying(255),
@@ -138,134 +135,134 @@ CREATE TABLE IF NOT EXISTS "IIAEMS".mailing_list
     opt_out_date timestamp with time zone,
     source character varying,
     "is-verified" boolean,
-    email_status character varying(255) DEFAULT Pending,
+    email_status character varying(255) DEFAULT 'Pending',
     PRIMARY KEY (id),
     CONSTRAINT email UNIQUE (email)
 );
 
-ALTER TABLE IF EXISTS "IIAEMS".instructor_courses
+ALTER TABLE IF EXISTS instructor_courses
     ADD CONSTRAINT username FOREIGN KEY (username)
-    REFERENCES "IIAEMS".users (username) MATCH SIMPLE
+    REFERENCES users (username) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".instructor_courses
+ALTER TABLE IF EXISTS instructor_courses
     ADD CONSTRAINT course_id FOREIGN KEY (course_id)
-    REFERENCES "IIAEMS".courses (course_id) MATCH SIMPLE
+    REFERENCES courses (course_id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".modules
-    ADD CONSTRAINT course_id FOREIGN KEY (course_id)
-    REFERENCES "IIAEMS".courses (course_id) MATCH SIMPLE
+ALTER TABLE IF EXISTS modules
+    ADD CONSTRAINT modules_course_id FOREIGN KEY (course_id)
+    REFERENCES courses (course_id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".transaction_history
+ALTER TABLE IF EXISTS transaction_history
     ADD CONSTRAINT username FOREIGN KEY (username)
-    REFERENCES "IIAEMS".users (username) MATCH SIMPLE
+    REFERENCES users (username) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".calendar
+ALTER TABLE IF EXISTS calendar
     ADD CONSTRAINT user_name FOREIGN KEY (username)
-    REFERENCES "IIAEMS".users (username) MATCH SIMPLE
+    REFERENCES users (username) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".discussion_forum
-    ADD CONSTRAINT course_id FOREIGN KEY (course_id)
-    REFERENCES "IIAEMS".courses (course_id) MATCH SIMPLE
+ALTER TABLE IF EXISTS discussion_forum
+    ADD CONSTRAINT disc_course_id FOREIGN KEY (course_id)
+    REFERENCES courses (course_id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".discussion_forum
-    ADD CONSTRAINT module_title FOREIGN KEY (module_title)
-    REFERENCES "IIAEMS".modules (module_title) MATCH SIMPLE
+ALTER TABLE IF EXISTS discussion_forum
+    ADD CONSTRAINT module_title FOREIGN KEY (course_id, module_title)
+    REFERENCES modules (course_id, module_title) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".discussion_forum
+ALTER TABLE IF EXISTS discussion_forum
     ADD CONSTRAINT comment_username FOREIGN KEY (comment_username)
-    REFERENCES "IIAEMS".users (username) MATCH SIMPLE
+    REFERENCES users (username) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".discussion_forum
+ALTER TABLE IF EXISTS discussion_forum
     ADD CONSTRAINT parent_comment_id FOREIGN KEY (forum_id)
-    REFERENCES "IIAEMS".discussion_forum (forum_id) MATCH SIMPLE
+    REFERENCES discussion_forum (forum_id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".mailbox
-    ADD CONSTRAINT username FOREIGN KEY (sender_username)
-    REFERENCES "IIAEMS".users (username) MATCH SIMPLE
+ALTER TABLE IF EXISTS mailbox
+    ADD CONSTRAINT mail_username FOREIGN KEY (sender_username)
+    REFERENCES users (username) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".mailbox
-    ADD CONSTRAINT username FOREIGN KEY (recipient_username)
-    REFERENCES "IIAEMS".users (username) MATCH SIMPLE
+ALTER TABLE IF EXISTS mailbox
+    ADD CONSTRAINT mail_username1 FOREIGN KEY (recipient_username)
+    REFERENCES users (username) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".enrollment
+ALTER TABLE IF EXISTS enrollment
     ADD CONSTRAINT username FOREIGN KEY (username)
-    REFERENCES "IIAEMS".users (username) MATCH SIMPLE
+    REFERENCES users (username) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".enrollment
+ALTER TABLE IF EXISTS enrollment
     ADD CONSTRAINT course_id FOREIGN KEY (course_id)
-    REFERENCES "IIAEMS".courses (course_id) MATCH SIMPLE
+    REFERENCES courses (course_id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".grades
+ALTER TABLE IF EXISTS grades
     ADD CONSTRAINT username FOREIGN KEY (username)
-    REFERENCES "IIAEMS".users (username) MATCH SIMPLE
+    REFERENCES users (username) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".grades
-    ADD CONSTRAINT course_id FOREIGN KEY (course_id)
-    REFERENCES "IIAEMS".courses (course_id) MATCH SIMPLE
+ALTER TABLE IF EXISTS grades
+    ADD CONSTRAINT grades_course_id FOREIGN KEY (course_id)
+    REFERENCES courses (course_id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "IIAEMS".grades
-    ADD CONSTRAINT module_title FOREIGN KEY (module_title)
-    REFERENCES "IIAEMS".modules (module_title) MATCH SIMPLE
+ALTER TABLE IF EXISTS grades
+    ADD CONSTRAINT module_title FOREIGN KEY (course_id, module_title)
+    REFERENCES modules (course_id, module_title) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
